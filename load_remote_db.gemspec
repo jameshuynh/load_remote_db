@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["James Huynh"]
   spec.email         = ["james@rubify.com"]
 
-  spec.summary       = %q{Load Remote DB for Mina/Capistrano}
-  spec.description   = %q{Load Remote DB for Mina/Capistrano}
-  spec.homepage      = "http://jameshuynh.com"
+  spec.summary       = %q{Load MySQL Remote DB for Mina/Capistrano}
+  spec.description   = %q{Load MySQL Remote DB for Mina/Capistrano}
+  spec.homepage      = "https://github.com/jameshuynh/load_remote_db"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
