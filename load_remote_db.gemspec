@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["James Huynh"]
   spec.email         = ["james@rubify.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Load Remote DB for Mina/Capistrano}
+  spec.description   = %q{Load Remote DB for Mina/Capistrano}
+  spec.homepage      = "http://jameshuynh.com"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
