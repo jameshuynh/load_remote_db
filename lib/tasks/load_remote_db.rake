@@ -13,7 +13,7 @@ end
 class RemoteDbLoader
   def call(args)
     env = 'staging'
-    env = args[1] unless args.count > 1
+    env = args[1] if args.count > 1
 
     database_yml =
       "#{Rails.root}/config/database.yml"
