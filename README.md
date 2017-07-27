@@ -30,13 +30,14 @@ Or install it yourself as:
 
 Simply execute the command:
 
-    $ [bundle exec] rake load_remote_db:run [SERVER=environment] [SYNC_FOLDER=folder] [DOWNLOAD_ONLY=true]
+    $ [bundle exec] rake db:load_from_remote [SERVER=environment] [SYNC_FOLDER=folder] [DOWNLOAD_ONLY=true]
 
 For instance
 
-    $ bundle exec rake load_remote_db:run SERVER=staging
-    $ bundle exec rake load_remote_db:run SERVER=staging SYNC_FOLDER=public/system
-    $ bundle exec rake load_remote_db:run SERVER=staging DOWNLOAD_ONLY=true
+    $ bundle exec rake db:load_from_remote SERVER=staging
+    $ bundle exec rake db:load_from_remote SERVER=staging SYNC_FOLDER=public/system
+    $ bundle exec rake db:load_from_remote SERVER=staging DOWNLOAD_ONLY=true
+
 
 
 ## Development
@@ -57,4 +58,5 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[james
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
 
