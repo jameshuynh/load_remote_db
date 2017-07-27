@@ -7,7 +7,10 @@ This gem is used to download & load the remote database into your local developm
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'load_remote_db'
+group :development do
+  # ...
+  gem 'load_remote_db'
+end
 ```
 
 And then execute:
@@ -17,6 +20,7 @@ And then execute:
 Or install it yourself as:
 
     $ gem install load_remote_db
+
 
 
 
@@ -53,3 +57,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[james
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
