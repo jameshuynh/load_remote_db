@@ -3,17 +3,18 @@ require 'yaml'
 require 'json'
 require 'shellwords'
 
-namespace :load_remote_db do
-  task :run do |t, _|
-    args = ARGV
-    RemoteDbLoader.new.call(args)
+namespace :db do
+  task :load_from_remote do |t, _|
+    RemoteDbLoader.new.call
   end
 end
 
 class RemoteDbLoader
-  def call(args)
+  def call
     env = 'staging'
-    env = args[1] if args.count > 1
+    env = ENV['SERVER'] if ENV['SERVER'].present?
+
+    to_be_rsync_folder = ENV['SYNC_FOLDER']
 
     database_yml =
       "#{Rails.root}/config/database.yml"
@@ -46,29 +47,68 @@ class RemoteDbLoader
     backup_command = %(ssh #{@server_user}@#{@server_ip} #{mysql_cmd})
     system(backup_command)
 
-    puts 'Downloading remote backup file...'
-    download_db_dump_command =
-      %(scp #{@server_user}@#{@server_ip}:#{shared_path}/backup.sql .)
+    check_gzip_exist_cmd = 'which gzip'
+    check_gzip_exist_remote_cmd =
+      %(ssh #{@server_user}@#{@server_ip} #{check_gzip_exist_cmd})
 
-    `#{download_db_dump_command}`
+    puts 'Checking for remote gzip location...'
+    gzip_exist = system(check_gzip_exist_remote_cmd) != ''
+
+    if gzip_exist
+      puts 'zipping remote backup file...'
+      zip_cmd = "gzip -f #{shared_path}/backup.sql"
+      zip_cmd_remote =
+        %(ssh #{@server_user}@#{@server_ip} #{zip_cmd})
+      system(zip_cmd_remote)
+    end
+
+    puts 'Downloading remote backup file...'
+    bk_extension = gzip_exist ? 'sql.gz' : 'sql'
+    download_db_dump_command =
+      %(scp #{@server_user}@#{@server_ip}:#{shared_path}/backup.#{bk_extension} .)
+
+    system(download_db_dump_command)
 
     puts 'Deleting remote backup file...'
     delete_db_dump_command = %(ssh #{@server_user}@#{@server_ip} \
-    "rm -rf #{shared_path}/backup.sql")
+    "rm -rf #{shared_path}/backup.#{bk_extension}")
 
-    if password == nil
-      import_db_cmd =
-        %(mysql -u #{username} #{database} < backup.sql)
-    else
-      import_db_cmd =
-        %(mysql -u #{username} -p'#{password}' #{database} < backup.sql)
+    system(delete_db_dump_command)
+
+    if gzip_exist
+      `gunzip -f backup.sql.gz`
     end
 
-    puts 'Importing database into local environment...'
-    `#{import_db_cmd}`
+    if ENV['DOWNLOAD_ONLY']
+      puts 'backup.sql file is now stored at your Rails root folder!'
+      `open .`
+    else
+      if password == nil
+        import_db_cmd =
+          %(mysql -u #{username} #{database} < backup.sql)
+      else
+        import_db_cmd =
+          %(mysql -u #{username} -p'#{password}' #{database} < backup.sql)
+      end
 
-    puts 'Cleaning up...'
-    `rm backup.sql`
+      puts 'Importing database into local environment...'
+      `#{import_db_cmd}`
+
+      puts 'Cleaning up database backup...'
+      `rm backup.sql`
+    end
+
+    if to_be_rsync_folder
+      puts "Synchorinizing #{to_be_rsync_folder} folder..."
+      `mkdir -p 'public/#{to_be_rsync_folder.gsub('public/', '')}'`
+      sync_folder_cmd = %(rsync -r \
+#{@server_user}@#{@server_ip}:#{shared_path}/#{to_be_rsync_folder} \
+'public/#{to_be_rsync_folder.gsub('public/', '')}')
+      puts sync_folder_cmd
+      system(sync_folder_cmd)
+    end
+
+    puts 'DONE!'
   end
 
   def method_missing(name, *args, &block)
