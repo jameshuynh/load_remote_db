@@ -112,7 +112,7 @@ class RemoteDbLoader
   end
 
   def method_missing(name, *args, &block)
-    return unless %I[server set].include?(name)
+    return self unless %I[server set].include?(name)
     @server_ip ||= if name == :server
                      args[0]
                    elsif name == :set && args[0] == :domain
