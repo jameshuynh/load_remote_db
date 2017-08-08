@@ -20,7 +20,7 @@ class RemoteDbLoader
       "#{Rails.root}/config/database.yml"
     development_db = YAML.load_file(database_yml)['development']
 
-    username = development_db['username']
+    username = development_db['username'] || 'root'
     password = development_db['password']
     database = development_db['database']
 
@@ -35,7 +35,7 @@ class RemoteDbLoader
     shared_path = "#{@deploy_to}/shared"
 
     remote_db_config = eval `#{get_db_info_command}`
-    remote_db_username = remote_db_config["username"]
+    remote_db_username = remote_db_config["username"] || 'root'
     remote_db_password = remote_db_config["password"]
     remote_db_host = remote_db_config["host"]
     remote_db_name = remote_db_config["database"]
