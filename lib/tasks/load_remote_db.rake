@@ -83,6 +83,9 @@ class RemoteDbLoader
       puts 'backup.sql file is now stored at your Rails root folder!'
       `open .`
     else
+      # run db create in case the db does not exist
+      %(bundle exec rake db:create)
+
       if password == nil
         import_db_cmd =
           %(mysql -u #{username} #{database} < backup.sql)
