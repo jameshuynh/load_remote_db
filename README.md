@@ -35,7 +35,7 @@ Simply execute the command:
 For instance
 
     $ bundle exec rake db:load_from_remote SERVER=staging
-    $ bundle exec rake db:load_from_remote SERVER=staging SYNC_FOLDER=public/system
+    $ bundle exec rake db:load_from_remote SERVER=staging SYNC_FOLDER=public/system/
     $ bundle exec rake db:load_from_remote SERVER=staging DOWNLOAD_ONLY=true
 
 
