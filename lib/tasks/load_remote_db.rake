@@ -24,16 +24,22 @@ class RemoteDbLoader
     password = development_db['password']
     database = development_db['database']
 
+    begin
+      eval File.read("#{Rails.root}/config/deploy.rb")
+    rescue LoadError
+    end
     eval File.read("#{Rails.root}/config/deploy/#{env}.rb")
+    port = @port || 22
 
     ## get remote database config.yml
-    get_db_info_command = %{ssh #{@server_user}@#{@server_ip} \
+    get_db_info_command = %{ssh #{@server_user}@#{@server_ip} -p#{port} \
     "/home/#{@server_user}/.rbenv/shims/ruby -e \
     \\"require 'yaml'; \
     puts YAML.load_file('#{@deploy_to}/shared/config/database.yml')['#{env}']\\""}
 
     shared_path = "#{@deploy_to}/shared"
 
+    puts get_db_info_command
     remote_db_config = eval `#{get_db_info_command}`
     remote_db_username = remote_db_config["username"] || 'root'
     remote_db_password = remote_db_config["password"]
@@ -44,12 +50,12 @@ class RemoteDbLoader
     puts 'Running the remote backup...'
     mysql_cmd = "mysqldump -u #{remote_db_username} -p'#{remote_db_password}' \
     -h #{remote_db_host} #{remote_db_name} > #{shared_path}/backup.sql".shellescape
-    backup_command = %(ssh #{@server_user}@#{@server_ip} #{mysql_cmd})
+    backup_command = %(ssh #{@server_user}@#{@server_ip} -p#{port} #{mysql_cmd})
     system(backup_command)
 
     check_gzip_exist_cmd = 'which gzip'
     check_gzip_exist_remote_cmd =
-      %(ssh #{@server_user}@#{@server_ip} #{check_gzip_exist_cmd})
+      %(ssh #{@server_user}@#{@server_ip} -p#{port} #{check_gzip_exist_cmd})
 
     puts 'Checking for remote gzip location...'
     gzip_exist = system(check_gzip_exist_remote_cmd) != ''
@@ -58,19 +64,19 @@ class RemoteDbLoader
       puts 'zipping remote backup file...'
       zip_cmd = "gzip -f #{shared_path}/backup.sql"
       zip_cmd_remote =
-        %(ssh #{@server_user}@#{@server_ip} #{zip_cmd})
+        %(ssh #{@server_user}@#{@server_ip} -p#{port} #{zip_cmd})
       system(zip_cmd_remote)
     end
 
     puts 'Downloading remote backup file...'
     bk_extension = gzip_exist ? 'sql.gz' : 'sql'
     download_db_dump_command =
-      %(scp #{@server_user}@#{@server_ip}:#{shared_path}/backup.#{bk_extension} .)
+      %(scp -P#{port} #{@server_user}@#{@server_ip}:#{shared_path}/backup.#{bk_extension} .)
 
     system(download_db_dump_command)
 
     puts 'Deleting remote backup file...'
-    delete_db_dump_command = %(ssh #{@server_user}@#{@server_ip} \
+    delete_db_dump_command = %(ssh #{@server_user}@#{@server_ip} -p#{port} \
     "rm -rf #{shared_path}/backup.#{bk_extension}")
 
     system(delete_db_dump_command)
@@ -115,6 +121,22 @@ class RemoteDbLoader
   end
 
   def method_missing(name, *args, &block)
+    if name == :fetch && args[0] == :deploy_user
+      return @server_user
+    end
+
+    if name == :fetch && args[0] == :application
+      return @application
+    end
+
+    if name == :fetch && args[0] == :full_app_name
+      return @full_app_name
+    end
+
+    if name == :fetch && args[0] == :stage
+      return @stage
+    end
+
     return self unless %I[server set].include?(name)
     @server_ip ||= if name == :server
                      args[0]
@@ -122,6 +144,11 @@ class RemoteDbLoader
                      args[1]
                    end
     @server_user ||= args[1] if name == :set && args[0] == :user
+    @stage ||= args[1] if name == :set && args[0] == :stage
+    @server_user = args[1] if name == :set && args[0] == :deploy_user
+    @application ||= args[1] if name == :set && args[0] == :application
+    @full_app_name ||= args[1] if name == :set && args[0] == :full_app_name
+    @port ||= args[1] if name == :set && args[0] == :port
     @deploy_to ||= args[1] if name == :set && args[0] == :deploy_to
   end
 end
