@@ -32,7 +32,11 @@ class RemoteDbLoader
     port = @port || 22
 
     ## get remote database config.yml
+    puts "ssh #{@server_user}@#{@server_ip} -p#{port} which ruby"
     ruby_cmd = `ssh #{@server_user}@#{@server_ip} -p#{port} which ruby`.strip
+    if ruby_cmd.blank?
+      ruby_cmd = "/home/#{@server_user}/.rbenv/shims/ruby"
+    end
     get_db_info_command = %{ssh #{@server_user}@#{@server_ip} -p#{port} \
     "#{ruby_cmd} -e \
     \\"require 'yaml'; \
