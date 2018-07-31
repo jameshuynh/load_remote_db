@@ -18,7 +18,7 @@ class RemoteDbLoader
 
     database_yml =
       "#{Rails.root}/config/database.yml"
-    development_db = YAML.load_file(database_yml)['development']
+    development_db = YAML.load_file(database_yml)[ENV['RAILS_ENV'] || 'development']
 
     username = development_db['username'] || 'root'
     password = development_db['password']
