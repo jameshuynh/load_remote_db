@@ -100,10 +100,10 @@ class RemoteDbLoader
 
       if password == nil
         import_db_cmd =
-          %(mysql -u #{username} #{database} -h #{remote_db_host} < backup.sql)
+          %(mysql -u #{username} #{database} -h #{host} < backup.sql)
       else
         import_db_cmd =
-          %(mysql -u #{username} -p'#{password}' -h #{remote_db_host} #{database} < backup.sql)
+          %(mysql -u #{username} -p'#{password}' -h #{host} #{database} < backup.sql)
       end
 
       puts 'Importing database into local environment...'
