@@ -23,6 +23,7 @@ class RemoteDbLoader
     username = development_db['username'] || 'root'
     password = development_db['password']
     database = development_db['database']
+    host = development_db['host']
 
     begin
       eval File.read("#{Rails.root}/config/deploy.rb")
@@ -48,7 +49,7 @@ class RemoteDbLoader
     remote_db_config = eval `#{get_db_info_command}`
     remote_db_username = remote_db_config["username"] || 'root'
     remote_db_password = remote_db_config["password"]
-    remote_db_host = remote_db_config["host"]
+    remote_db_host = remote_db_config["host"] || 'localhost'
     remote_db_name = remote_db_config["database"]
 
     ## run the real backup
@@ -99,10 +100,10 @@ class RemoteDbLoader
 
       if password == nil
         import_db_cmd =
-          %(mysql -u #{username} #{database} < backup.sql)
+          %(mysql -u #{username} #{database} -h #{remote_db_host} < backup.sql)
       else
         import_db_cmd =
-          %(mysql -u #{username} -p'#{password}' #{database} < backup.sql)
+          %(mysql -u #{username} -p'#{password}' -h #{remote_db_host} #{database} < backup.sql)
       end
 
       puts 'Importing database into local environment...'
