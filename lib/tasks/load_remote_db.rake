@@ -23,7 +23,7 @@ class RemoteDbLoader
     username = development_db['username'] || 'root'
     password = development_db['password']
     database = development_db['database']
-    host = development_db['host']
+    host = development_db['host'] || 'localhost'
 
     begin
       eval File.read("#{Rails.root}/config/deploy.rb")
