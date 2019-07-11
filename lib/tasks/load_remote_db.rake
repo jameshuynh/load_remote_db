@@ -47,10 +47,10 @@ class RemoteDbLoader
 
     puts get_db_info_command
     remote_db_config = eval `#{get_db_info_command}`
-    remote_db_username = remote_db_config["username"] || 'root'
-    remote_db_password = remote_db_config["password"]
     remote_db_host = remote_db_config["host"] || 'localhost'
     remote_db_name = remote_db_config["database"]
+    remote_db_username = remote_db_config["username"] || 'root'
+    remote_db_password = remote_db_config["password"]
 
     ## run the real backup
     puts 'Running the remote backup...'
@@ -115,10 +115,10 @@ class RemoteDbLoader
 
     if to_be_rsync_folder
       puts "Synchorinizing #{to_be_rsync_folder} folder..."
-      `mkdir -p 'public/#{to_be_rsync_folder.gsub('public/', '')}'`
+      `mkdir -p #{to_be_rsync_folder}`
       sync_folder_cmd = %(rsync -r \
 #{@server_user}@#{@server_ip}:#{shared_path}/#{to_be_rsync_folder} \
-'public/#{to_be_rsync_folder.gsub('public/', '')}')
+'#{to_be_rsync_folder}')
       puts sync_folder_cmd
       system(sync_folder_cmd)
     end
