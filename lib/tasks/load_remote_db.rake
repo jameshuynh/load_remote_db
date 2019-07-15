@@ -117,8 +117,8 @@ class RemoteDbLoader
       puts "Synchorinizing #{to_be_rsync_folder} folder..."
       `mkdir -p #{to_be_rsync_folder}`
       sync_folder_cmd = %(rsync -r \
-#{@server_user}@#{@server_ip}:#{shared_path}/#{to_be_rsync_folder} \
-'#{to_be_rsync_folder}')
+#{@server_user}@#{@server_ip}:#{shared_path}/#{to_be_rsync_folder}/ \
+#{to_be_rsync_folder})
       puts sync_folder_cmd
       system(sync_folder_cmd)
     end
