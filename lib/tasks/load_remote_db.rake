@@ -55,7 +55,8 @@ class RemoteDbLoader
     ## run the real backup
     puts 'Running the remote backup...'
     mysql_cmd = "mysqldump -u #{remote_db_username} -p'#{remote_db_password}' \
-    -h #{remote_db_host} #{remote_db_name} > #{shared_path}/backup.sql".shellescape
+    -h #{remote_db_host} --set-gtid-purged=OFF #{remote_db_name} > \
+    #{shared_path}/backup.sql".shellescape
     backup_command = %(ssh #{@server_user}@#{@server_ip} -p#{port} #{mysql_cmd})
     system(backup_command)
 
