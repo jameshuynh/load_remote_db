@@ -43,7 +43,7 @@ class RemoteDbLoader
     \\"require 'yaml'; \
     puts YAML.load_file('#{@deploy_to}/shared/config/database.yml')['#{env}']\\""}
 
-    shared_path = "#{@deploy_to}/shared"
+    shared_path = ENV['TEMP_STORED_FOLDER'] || "#{@deploy_to}/shared"
 
     puts get_db_info_command
     remote_db_config = eval `#{get_db_info_command}`
