@@ -128,7 +128,7 @@ class RemoteDbLoader
   end
 
   def method_missing(name, *args, &block)
-    if name == :fetch && args[0] == :deploy_user
+    if name == :fetch && (args[0] == :deploy_user || args[0] == :user)
       return @server_user
     end
 
@@ -156,6 +156,9 @@ class RemoteDbLoader
     @application ||= args[1] if name == :set && args[0] == :application
     @full_app_name ||= args[1] if name == :set && args[0] == :full_app_name
     @port ||= args[1] if name == :set && args[0] == :port
-    @deploy_to ||= args[1] if name == :set && args[0] == :deploy_to
+    if name == :set && args[0] == :deploy_to
+      puts args[1]
+      @deploy_to ||= args[1]
+    end
   end
 end
