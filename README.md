@@ -30,13 +30,14 @@ Or install it yourself as:
 
 Simply execute the command:
 
-    $ [bundle exec] rake db:load_from_remote [SERVER=environment] [SYNC_FOLDER=folder] [DOWNLOAD_ONLY=true]
+    $ [bundle exec] rake db:load_from_remote [SERVER=environment] [SYNC_FOLDER=folder] [DOWNLOAD_ONLY=true] [TEMP_STORED_FOLDER=/path/that/you/want/to/store/temp/backup/]
 
 For instance
 
     $ bundle exec rake db:load_from_remote SERVER=staging
     $ bundle exec rake db:load_from_remote SERVER=staging SYNC_FOLDER=public/system/
     $ bundle exec rake db:load_from_remote SERVER=staging DOWNLOAD_ONLY=true
+    $ bundle exec rake db:load_from_remote SERVER=staging TEMP_STORED_FOLDER=/storage/
 
 
 
